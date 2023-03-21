@@ -2,7 +2,7 @@
 #CASE CONTROL COMPARISON#
 #########################
 #reyka@wustl.edu#########
-#Last updated March 10th, 2023
+#Last updated March 18th, 2023
 ###############################
 
 ##This script is doing pairwise DEG analysis between a set of controls and patients using a Seurat object
@@ -12,34 +12,41 @@ library(Seurat)
 library(pheatmap)
 library(tidyverse)
 
- controlsd28<-c("None_Patient_17_Day_28-10","None_Patient_27_Day_28-16","None_Patient_33_Day_28-24","None_Patient_36_Day_28-27","None_Patient-009-Day-28-1","None_Patient-026-Day-28-10","None_Patient_11_Day_28-7")
- patientsd28<-c("GvHD_Patient_24_Day_28-13","GvHD_Patient_29_Day_28-19","GvHD_Patient_31_Day_28-22","GvHD_Patient_38_Day_28-30","GvHD_Patient-016-Day-28-4")
-
-  #controlsd28<-c("Control-1-Day-28-13","Control-2-Day-28-15","Control_5_Day_28-1","Control_6_Day_28-3")
-  #patientsd28<-c("Patient_17_Day_28-10","Patient_11_Day_28-7","Patient_24_Day_28-13","Patient_27_Day_28-16","Patient_29_Day_28-19","Patient_31_Day_28-22","Patient_33_Day_28-24","Patient_36_Day_28-27","Patient_38_Day_28-30","Patient-009-Day-28-1","Patient-016-Day-28-4","Patient-026-Day-28-10")
-
-###To name output file
+###Suffice name to append to output
 file="D28"
 
-seurat_obj=patient_monomacro_d28
+#Read in Seurat Object
+seurat_obj=readRDS("object.rds")
+
+#Column of metadata table with groups to compare
 metadataforgroup="acute_GVHD_patient"
 
-  datalist = list()
+#Two lists of samples or variables to compare that should exist in column of metadata indicated above
+controls<-c("None_Patient_17_Day_28-10","None_Patient_27_Day_28-16","None_Patient_33_Day_28-24","None_Patient_36_Day_28-27","None_Patient-009-Day-28-1","None_Patient-026-Day-28-10","None_Patient_11_Day_28-7")
+cases<-c("GvHD_Patient_24_Day_28-13","GvHD_Patient_29_Day_28-19","GvHD_Patient_31_Day_28-22","GvHD_Patient_38_Day_28-30","GvHD_Patient-016-Day-28-4")
+
+#create list to store data
+datalist = list()
+
+#Set idents of object
   Idents(seurat_obj)<-seurat_obj@meta.data[[metadataforgroup]]
-  for (control in controlsd28){
-    for (patient in patientsd28){
+
+#For each case-control comparison - evaluate DEGs using FindAllMarkers
+  for (control in controls){
+    for (patient in cases){
       compgroup="D28" ###Might want to change this but doesnt matter. 
       group1=control
       group2=patient
+      #Define comparison group
       i=paste0(group1,"_",group2)
-      print(group1)
-      print(group2)
+      print(paste0("Comparing:",group1," vs. ",group2))
       #Calculate differentially expressed genes between two groups of interest
       df <- FindMarkers(object = seurat_obj,only.pos=FALSE,min.pct=0.3,ident.1=c(paste0(group1)),ident.2=paste0(group2))
       dfup = df[df$avg_log2FC  >= 0.5 & df$p_val_adj <= 0.05,] ###Change this if you want to make less stringent with respect to avg_log2FC
       dfdown = df[df$avg_log2FC  <= -0.5 & df$p_val_adj <= 0.05,] ###Change this if you want to make less stringent with respect to avg_log2FC
       upreggenes<-nrow(dfup)
       downreggenes<-nrow(dfdown)
+      #Report on DEGs for this comparison
       print(paste0(i,"Upregulated genes:",upreggenes," Downregulated genes:",downreggenes))
       if ( (upreggenes >= 1) && (downreggenes >= 1) ){
         dfup$ident1<-paste0(group1)
