@@ -15,11 +15,13 @@
 devtools::install_github('dviraran/SingleR')
 install.packages(pkgs = 'devtools')
 devtools::install_github('ZJUFanLab/scCATCH')
+remotes::install_github("LTLA/celldex")
 
 #load packages
 library(Seurat)
 library(ggplot2)
 library(SingleR)
+library(celldex)
 
 myobject=readRDS("object.rds") #Load in your seurat_object of interest
 
@@ -40,7 +42,7 @@ obj.sce <- as.SingleCellExperiment(Seurat_Object_Diet)
 ref <- MonacoImmuneData()
 #singleR usage
 #http://bioconductor.org/books/devel/SingleRBook/using-the-classic-mode.html#annotating-the-test-dataset
-pred <- SingleR(test = obj.sce, ref = ref, 
+pred <- SingleR(method = "single",sc_data =  obj.sce, ref = ref, 
     labels = ref$label.fine, assay.type.test=1)
 ref_pred<-as.data.frame(pred)
 #Extract columns of interest to add to seurat object
@@ -52,7 +54,7 @@ myobject <- AddMetaData(
   metadata = ref_predictions)
 
 ref <- NovershternHematopoieticData()
-pred <- SingleR(test = obj.sce, ref = ref, 
+pred <- SingleR(method = "single",sc_data = obj.sce, ref = ref, 
     labels = ref$label.fine, assay.type.test=1)
 ref_pred<-as.data.frame(pred)
 ref_predictions<- ref_pred %>%
@@ -63,7 +65,7 @@ myobject <- AddMetaData(
   metadata = ref_predictions)
 
 ref <- DatabaseImmuneCellExpressionData()
-pred <- SingleR(test = obj.sce, ref = ref, 
+pred <- SingleR(method = "single",sc_data = obj.sce, ref = ref, 
     labels = ref$label.fine, assay.type.test=1)
 ref_pred<-as.data.frame(pred)
 ref_predictions<- ref_pred %>%
@@ -74,7 +76,7 @@ myobject <- AddMetaData(
   metadata = ref_predictions)
 
 ref <- HumanPrimaryCellAtlasData()
-pred <- SingleR(test = obj.sce, ref = ref, 
+pred <- SingleR(method = "single",sc_data = obj.sce, ref = ref, 
     labels = ref$label.fine, assay.type.test=1)
 ref_pred<-as.data.frame(pred)
 ref_predictions<- ref_pred %>%
@@ -85,7 +87,7 @@ myobject <- AddMetaData(
   metadata = ref_predictions)
 
 ref <- BlueprintEncodeData()
-pred <- SingleR(test = obj.sce, ref = ref, 
+pred <- SingleR(method = "single",sc_data = obj.sce, ref = ref, 
     labels = ref$label.fine, assay.type.test=1)
 ref_pred<-as.data.frame(pred)
 ref_predictions<- ref_pred %>%
