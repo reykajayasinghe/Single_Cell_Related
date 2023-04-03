@@ -7,6 +7,11 @@
 #[3] scCATCH: https://cran.r-project.org/web/packages/scCATCH/vignettes/tutorial.html
 
 ####Install before starting####
+#prior to installling these github packages you may need to run the following to 
+#set up github path
+#create_github_token() #Take link from this command and paste in browser and follow details to generate login
+#Sys.setenv(GITHUB_PAT = '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') #copy token thats created to this path
+
 devtools::install_github('dviraran/SingleR')
 install.packages(pkgs = 'devtools')
 devtools::install_github('ZJUFanLab/scCATCH')
